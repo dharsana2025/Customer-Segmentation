@@ -1,49 +1,56 @@
-# Algorithmic Customer Segmentation: End-to-End K-Means Clustering
+# Algorithmic Customer Segmentation: RFM Feature Engineering & K-Means Clustering
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://github.com/dharsana2025/Customer-Segmentation/blob/main/Python%20Notebook/customer_segmentation_KMeans_Clustering.ipynb)
 
 ## 📌 Project Overview
-This project builds a robust, unsupervised machine learning pipeline to segment an enterprise retail customer base using the **Online Retail II** dataset (**525,461 initial transactions**). By engineering behavioral features and executing strict statistical outlier suppression, this architecture clusters customers based on transaction behavior to drive automated, targeted downstream marketing and retention workflows.
+This project delivers an end-to-end customer segmentation framework utilizing the **Online Retail II dataset (525,461 initial rows)**. Instead of applying unsupervised learning directly to raw transactional logs, the pipeline first implements an **RFM (Recency, Frequency, Monetary) behavioral model** to extract structured domain-specific features per customer. These standardized dimensions are then processed via optimized **K-Means Clustering** to isolate distinct behavioral cohorts for automated, targeted marketing and retention strategies.
 
-### Pipeline Highlights
-* **Data Scale:** 525,461 structural transaction records processed.
-* **Mathematical Validation:** Joint **Elbow Method (WCSS)** and **Silhouette Coefficient Analysis** used to establish optimal mathematical cluster barriers.
-* **Operational Goal:** Isolate high-value champions, steady regular buyers, and high-risk churning populations for targeted activation.
+### 📊 The RFM Framework Core
+* **Recency (R):** Days since the customer's last transaction. Tracks engagement decay.
+* **Frequency (F):** Total number of distinct completed purchases. Measures loyalty and habituation.
+* **Monetary (M):** Total capital spent across the customer's history. Identifies financial value contribution.
 
 ---
 
 ## 🛠️ Tech Stack & Mathematical Architecture
-* **Data Engineering & Cleaning:** `pandas`, `numpy`
+* **Data Engineering & Behavioral Modeling:** `pandas`, `numpy`
 * **Machine Learning Pipelines:** `sklearn.cluster.KMeans`
-* **Statistical Optimization:** Interquartile Range (IQR) Proximity Boxing
-* **Dimensional Diagnostics:** Within-Cluster Sum of Squares (WCSS), Silhouette Scores
+* **Feature Scaling & Preprocessing:** `sklearn.preprocessing.StandardScaler`
+* **Statistical Optimization:** Interquartile Range (IQR) Proximity Boxing (Outlier Mitigation)
+* **Dimensional Diagnostics:** Within-Cluster Sum of Squares (WCSS / Elbow Method), Silhouette Scores
 * **Visualization Suite:** `seaborn`, `matplotlib`
 
 ---
 
-## ⚙️ Core Data Engineering Pipeline
+## ⚙️ Core Data Engineering & Modeling Pipeline
 
 ### 1. Production-Grade Data Sanitization
-* **Anomaly Isolation:** Detected and removed structural data noise including negative quantities, transaction cancellations, and invalid unit prices $\le 0$.
-* **Missing Value Resolution:** Dropped missing `Customer ID` fields to guarantee tracking integrity across historical paths.
+* **Anomaly Isolation:** Evaluated transactional integrity by detecting and dropping negative quantities, invoice cancellations, and invalid unit prices ($\le 0$).
+* **Identity Resolution:** Excluded rows missing a valid `Customer ID` to maintain clean tracking lineages across unique consumer profiles.
 
-### 2. Statistical Outlier Suppression
-* Because distance-based clustering algorithms (K-Means) are hyper-sensitive to extreme financial anomalies, an **Interquartile Range (IQR)** filter was established.
-* Bound limits were calculated to truncate extreme outliers, stabilizing cluster centroids and maximizing clear geometric separation.
+### 2. High-Fidelity RFM Feature Engineering
+Instead of relying on pre-aggregated data, a custom ETL pipeline was engineered to transition raw row-level transactional records into user-level behavioral dimensions:
+* **Recency (R) Calculation:** Identified the global maximum transaction date within the entire dataset to establish an operational baseline. For each unique customer, the delta (in days) between their most recent transaction date and the baseline date was computed.
+* **Frequency (F) Calculation:** Aggregated unique purchase events by isolating the count of distinct invoice numbers associated with each unique customer identifier, capturing actual buying cycles rather than line-item volumes.
+* **Monetary (M) Calculation:** Engineered a composite price feature at the item line level ($\text{Quantity} \times \text{UnitPrice}$) and aggregated the cumulative financial sum for each customer profile.
 
-### 3. Model Optimization & Diagnostics
-* Executed iterative K-Means algorithms across varying parameter spaces ($K$).
-* Evaluated the mathematical inflection point via the **WCSS Elbow Curve**.
-* Validated cluster density and cohesion via **Silhouette Analysis** to prevent segment overlap.
+### 3. Statistical Scaling & Outlier Mitigation
+* **Statistical Clipping:** Because distance-based spatial algorithms like K-Means are highly sensitive to extreme financial scale variance, an **Interquartile Range (IQR)** filter was established to bound outliers, stabilizing cluster centroids and maximizing clear geometric separation.
+* **Z-Score Feature Standardization:** Applied `StandardScaler` to bring variance-heavy RFM variables onto a uniform mathematical scale, preventing the high-magnitude Monetary column from dominating distance metrics during clustering.
+
+### 4. Clustering Diagnostics & Optimization
+* Executed iterative K-Means models across a broad hyperparameter space ($K$).
+* Plotted the **WCSS Elbow Curve** to determine the point of diminishing mathematical returns for intra-cluster variance compression.
+* Validated cluster density and cohesion boundaries using **Silhouette Score Analysis** to ensure distinct, non-overlapping customer cohorts.
 
 ---
 
-## 🎯 Strategic Business Activations
-The final model uncovers clear customer sub-populations that map to distinct commercial actions:
+## 🎯 Strategic Business Activations & Cohort Mapping
+The integrated RFM + K-Means model translates raw transactional logs into high-impact, actionable marketing pathways:
 
-* **High-Value Segments (Champions):** Characterized by high purchase volume and frequent activity. 
-  * *Strategy:* Enroll in VIP retention programs, early product releases, and high-tier loyalty pathways.
-* **Declining / At-Risk Segments:** Characterized by dropping order frequency and widening recency gaps.
-  * *Strategy:* Trigger automated re-engagement workflows, win-back discounts, and feedback surveys to mitigate permanent churn.
-* **Core Stability Segments:** Consistent, mid-tier transaction frequencies.
-  * *Strategy:* Cross-sell related product categories and use personalized upsell thresholds to increase Average Order Value (AOV).
+* **High-Value Segments (Champions):** Top-tier Frequency and Monetary scores paired with low Recency gaps. 
+  * *Strategy:* Enroll in VIP loyalty programs, grant early access to product rollouts, and utilize high-tier threshold upsells to maximize customer lifetime value (CLV).
+* **Declining / At-Risk Segments:** High historical Frequency and Monetary values, but with widening Recency gaps.
+  * *Strategy:* Trigger automated win-back workflows, targeted high-incentive promotional discounts, and feedback loops to proactively catch and stop permanent churn.
+* **Core Stability Segments:** Mid-tier, predictable purchasing rhythms across all three RFM spectrums.
+  * *Strategy:* Run personalized cross-category product recommendations to expand shopping basket breadth and drive incremental conversion velocity.
