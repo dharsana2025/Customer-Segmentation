@@ -1,6 +1,6 @@
 # Algorithmic Customer Segmentation: End-to-End K-Means Clustering
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://github.com/dharsana2025/Customer-Segmentation/blob/main/Python%20Notebook/customer_segmentation_KMeans_Clustering.ipynb)
 
 ## 📌 Project Overview
 This project builds a robust, unsupervised machine learning pipeline to segment an enterprise retail customer base using the **Online Retail II** dataset (**525,461 initial transactions**). By engineering behavioral features and executing strict statistical outlier suppression, this architecture clusters customers based on transaction behavior to drive automated, targeted downstream marketing and retention workflows.
